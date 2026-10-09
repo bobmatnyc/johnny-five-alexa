@@ -1,0 +1,16 @@
+[Unit]
+Description=Johnny Five Alexa bridge for Hermes and Codex
+After=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/johnny-five-alexa
+Environment=JOHNNY_FIVE_CONFIG=%h/.config/johnny-five-alexa/config.json
+ExecStart=%h/johnny-five-alexa/.venv/bin/python %h/johnny-five-alexa/bridge.py
+Restart=on-failure
+RestartSec=15
+UMask=0077
+NoNewPrivileges=true
+
+[Install]
+WantedBy=default.target

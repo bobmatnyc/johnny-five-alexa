@@ -1,0 +1,215 @@
+{
+  "interactionModel": {
+    "languageModel": {
+      "invocationName": "johnny five",
+      "intents": [
+        {
+          "name": "RequestIntent",
+          "slots": [
+            {
+              "name": "request",
+              "type": "AMAZON.SearchQuery"
+            }
+          ],
+          "samples": [
+            "please {request}",
+            "help me with {request}"
+          ]
+        },
+        {
+          "name": "CodexIntent",
+          "slots": [
+            {
+              "name": "request",
+              "type": "AMAZON.SearchQuery"
+            }
+          ],
+          "samples": [
+            "ask codex to {request}",
+            "tell codex to {request}",
+            "have codex {request}"
+          ]
+        },
+        {
+          "name": "HermesIntent",
+          "slots": [
+            {
+              "name": "request",
+              "type": "AMAZON.SearchQuery"
+            }
+          ],
+          "samples": [
+            "ask hermes to {request}",
+            "tell hermes to {request}",
+            "have hermes {request}"
+          ]
+        },
+        {
+          "name": "StatusIntent",
+          "samples": [
+            "the status of my last request",
+            "status of my last request",
+            "what is the status",
+            "my last result"
+          ]
+        },
+        {
+          "name": "AMAZON.HelpIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.StopIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.CancelIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.FallbackIntent",
+          "samples": []
+        },
+        {
+          "name": "HouseBriefingIntent",
+          "samples": [
+            "a house briefing",
+            "house briefing",
+            "my house briefing",
+            "how is the house",
+            "the house status"
+          ]
+        },
+        {
+          "name": "BacklogIntent",
+          "samples": [
+            "my backlog",
+            "the household backlog",
+            "what still needs doing",
+            "my home visit checklist"
+          ]
+        },
+        {
+          "name": "MediaCheckMovieIntent",
+          "slots": [
+            {
+              "name": "title",
+              "type": "AMAZON.SearchQuery"
+            }
+          ],
+          "samples": [
+            "if we have the movie {title}",
+            "do we have the movie {title}",
+            "whether we have the movie {title}",
+            "check for the movie {title}"
+          ]
+        },
+        {
+          "name": "MediaCheckSeriesIntent",
+          "slots": [
+            {
+              "name": "title",
+              "type": "AMAZON.SearchQuery"
+            }
+          ],
+          "samples": [
+            "if we have the show {title}",
+            "do we have the show {title}",
+            "check for the show {title}"
+          ]
+        },
+        {
+          "name": "MediaGetMovieIntent",
+          "slots": [
+            {
+              "name": "title",
+              "type": "AMAZON.SearchQuery"
+            }
+          ],
+          "samples": [
+            "get the movie {title}",
+            "download the movie {title}",
+            "add the movie {title}",
+            "check and get the movie {title}"
+          ]
+        },
+        {
+          "name": "MediaGetSeriesIntent",
+          "slots": [
+            {
+              "name": "title",
+              "type": "AMAZON.SearchQuery"
+            }
+          ],
+          "samples": [
+            "get the show {title}",
+            "download the show {title}",
+            "add the show {title}"
+          ]
+        },
+        {
+          "name": "MediaSeasonIntent",
+          "slots": [
+            {
+              "name": "selection",
+              "type": "AMAZON.SearchQuery"
+            }
+          ],
+          "samples": [
+            "download season {selection}",
+            "get season {selection}"
+          ]
+        },
+        {
+          "name": "MediaLatestSeasonIntent",
+          "slots": [
+            {
+              "name": "title",
+              "type": "AMAZON.SearchQuery"
+            }
+          ],
+          "samples": [
+            "download the latest season of {title}",
+            "get the latest season of {title}"
+          ]
+        },
+        {
+          "name": "MediaAllSeasonsIntent",
+          "slots": [
+            {
+              "name": "title",
+              "type": "AMAZON.SearchQuery"
+            }
+          ],
+          "samples": [
+            "download all seasons of {title}",
+            "get all seasons of {title}"
+          ]
+        },
+        {
+          "name": "MediaStatusIntent",
+          "slots": [
+            {
+              "name": "title",
+              "type": "AMAZON.SearchQuery"
+            }
+          ],
+          "samples": [
+            "the download status of {title}",
+            "the media status of {title}",
+            "check progress for {title}"
+          ]
+        },
+        {
+          "name": "MediaRecommendIntent",
+          "slots": [],
+          "samples": [
+            "something to watch",
+            "recommend a movie",
+            "movie recommendations"
+          ]
+        }
+      ],
+      "types": []
+    }
+  }
+}

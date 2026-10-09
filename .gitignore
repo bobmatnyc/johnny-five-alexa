@@ -1,0 +1,14 @@
+.env
+.env.*
+!.env.example
+config.json
+config.local.json
+*.local.json
+.state/
+.venv/
+__pycache__/
+*.pyc
+*.sqlite*
+*.log
+*.pem
+*.key
