@@ -55,6 +55,7 @@ def media_module():
 
 def answer_parts(result):
     """Accept structured Hermes answers while retaining old/plain-text jobs."""
+    if not isinstance(result, str): return 'Johnny Five', '', ''
     try:
         candidate = result.strip()
         if candidate.startswith('```') and candidate.endswith('```') and '\n' in candidate:
@@ -371,16 +372,27 @@ class Router:
 
 def worker(store, backends, stop):
     while not stop.is_set():
-        row = store.claim()
+        try:
+            row = store.claim()
+        except Exception as error:
+            print('Queue read failed: '+type(error).__name__, file=sys.stderr, flush=True)
+            stop.wait(1)
+            continue
         if not row:
             stop.wait(1)
             continue
         job, owner, target, prompt = row
         try:
             status, result = backends.run(target, prompt, job, owner)
+            if not isinstance(result, str) or not result.strip():
+                status, result = 'uncertain', 'The agent returned an empty answer. Check the agent conversation before trying again.'
         except Exception:
             status, result = 'uncertain', 'The agent connection failed. Check the agent conversation before trying again.'
-        store.finish(job, status, result)
+        try:
+            store.finish(job, status, result)
+        except Exception as error:
+            # The job stays 'running'; a restart marks it uncertain (Store.__init__).
+            print('Result write failed: '+type(error).__name__, file=sys.stderr, flush=True)
 
 
 def main():

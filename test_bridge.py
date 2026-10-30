@@ -1,6 +1,7 @@
 import json
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+import sqlite3
 import tempfile
 import threading
 import unittest
@@ -152,6 +153,61 @@ class BridgeTests(unittest.TestCase):
         status, result = self.store.latest('owner')
         self.assertEqual(status, 'uncertain')
         self.assertNotIn('secret', result)
+
+    def test_worker_survives_queue_read_error(self):
+        stop = threading.Event()
+        real_claim = self.store.claim
+        calls = iter([sqlite3.OperationalError('database is locked')])
+        def flaky_claim():
+            error = next(calls, None)
+            if error:
+                raise error
+            return real_claim()
+        class Answering:
+            def run(self, *args):
+                stop.set()
+                return 'completed', 'answer after retry'
+        self.store.submit('busy', 'owner', 'codex', 'hello')
+        with patch.object(self.store, 'claim', flaky_claim):
+            worker(self.store, Answering(), stop)
+        self.assertEqual(self.store.latest('owner'), ('completed', 'answer after retry'))
+
+    def test_worker_marks_empty_backend_answer_uncertain(self):
+        stop = threading.Event()
+        class Empty:
+            def run(self, *args):
+                stop.set()
+                return 'completed', None
+        self.store.submit('empty', 'owner', 'codex', 'hello')
+        worker(self.store, Empty(), stop)
+        status, result = self.store.latest('owner')
+        self.assertEqual(status, 'uncertain')
+        self.assertIn('empty answer', result)
+
+    def test_worker_survives_result_write_error(self):
+        stop = threading.Event()
+        real_finish = self.store.finish
+        calls = []
+        def flaky_finish(job, status, result):
+            calls.append(job)
+            if len(calls) == 1:
+                raise sqlite3.OperationalError('database is locked')
+            real_finish(job, status, result)
+        class Answering:
+            runs = 0
+            def run(self, *args):
+                Answering.runs += 1
+                if Answering.runs == 2:
+                    stop.set()
+                return 'completed', 'answer '+str(Answering.runs)
+        first = self.store.submit('first', 'owner', 'codex', 'hello')
+        second = self.store.submit('second', 'owner', 'codex', 'hello')
+        with patch.object(self.store, 'finish', flaky_finish):
+            worker(self.store, Answering(), stop)
+        self.assertEqual(calls, [first, second])
+        with self.store.connect() as db:
+            rows = dict(db.execute('SELECT id,status FROM jobs').fetchall())
+        self.assertEqual(rows, {first: 'running', second: 'completed'})
 
     def test_plaintext_not_ssml(self):
         job = self.store.submit('test', 'owner', 'codex', 'hello')
