@@ -35,6 +35,9 @@ agent; this repository does not include anyone's recipe PDFs or household data.
 ## Requirements
 
 - Linux host, Python 3.10 or newer, and the pinned Python dependencies.
+- On Debian and Ubuntu, install the venv module first (`sudo apt install python3-venv`,
+  or `python3.X-venv` for a specific version). Without it, `python3 -m venv` stops
+  with "ensurepip is not available".
 - An Amazon developer account associated with your Alexa devices.
 - A publicly reachable HTTPS endpoint with a trusted certificate.
 - Hermes with its authenticated API enabled, and/or an existing signed-in Codex
