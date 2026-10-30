@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from bridge import Backends, ROOT, load_config
+from bridge import Backends, ROOT, load_config, media_module
 
 
 class ConfigTests(unittest.TestCase):
@@ -47,6 +47,24 @@ class ConfigTests(unittest.TestCase):
         self.write({'ALEXA_SKILL_ID': 'example-skill'})
         with patch.dict(os.environ, {'ALEXA_SKILL_ID': 'override'}, clear=True):
             self.assertEqual(load_config(self.path)['ALEXA_SKILL_ID'], 'override')
+
+    def media_home(self, mode):
+        home = Path(self.temp.name) / 'media'
+        home.mkdir(mode=0o700)
+        config = home / 'config.json'
+        config.write_text(json.dumps({'plex': {'token': 'not-a-real-token'}}))
+        config.chmod(mode)
+        return home
+
+    def test_readable_media_config_is_rejected(self):
+        concierge = media_module()
+        with self.assertRaises(concierge.MediaError) as error:
+            concierge.Concierge(self.media_home(0o644))
+        self.assertNotIn('not-a-real-token', str(error.exception))
+
+    def test_private_media_config_is_loaded(self):
+        concierge = media_module().Concierge(self.media_home(0o600))
+        self.assertEqual(concierge.config['plex']['token'], 'not-a-real-token')
 
     def test_unconfigured_codex_is_reported_honestly(self):
         status, answer = Backends({}).run('codex', 'hello', 'example-job')

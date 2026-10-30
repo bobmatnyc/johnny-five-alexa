@@ -38,7 +38,11 @@ class Concierge:
     def __init__(self, home=HOME):
         self.home = Path(home)
         self.home.mkdir(parents=True, exist_ok=True, mode=0o700)
-        self.config = json.loads((self.home / 'config.json').read_text())
+        path = self.home / 'config.json'
+        stat = path.stat()
+        if stat.st_uid != os.getuid() or stat.st_mode & 0o077:
+            raise MediaError('Media configuration must be owned by this user with permissions 600')
+        self.config = json.loads(path.read_text())
         self.dbpath = self.home / 'jobs.sqlite3'
         with self.db() as db:
             db.execute('CREATE TABLE IF NOT EXISTS jobs (id TEXT PRIMARY KEY, identity TEXT UNIQUE, kind TEXT, external_id INTEGER, title TEXT, year INTEGER, seasons TEXT, arr_id INTEGER, phase TEXT, detail TEXT, created REAL, updated REAL, last_progress REAL, progress TEXT, scans INTEGER DEFAULT 0, last_scan REAL DEFAULT 0)')
