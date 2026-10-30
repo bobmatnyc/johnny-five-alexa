@@ -216,8 +216,8 @@ class BridgeTests(unittest.TestCase):
 
     def test_sdk_rejects_untrusted_certificate_host_before_fetch(self):
         from ask_sdk_webservice_support.verifier import RequestVerifier, VerificationException
-        with self.assertRaises(VerificationException):
-            RequestVerifier().verify({'SignatureCertChainUrl':'https://attacker.invalid/echo.api/cert.pem','Signature':'bad'}, '{}', None)
+        with self.assertRaisesRegex(VerificationException, 'invalid hostname'):
+            RequestVerifier().verify({'SignatureCertChainUrl':'https://attacker.invalid/echo.api/cert.pem','Signature-256':'bad'}, '{}', None)
 
     def test_sdk_rejects_stale_request(self):
         from ask_sdk_core.serialize import DefaultSerializer
