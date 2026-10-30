@@ -29,6 +29,25 @@ class BridgeTests(unittest.TestCase):
         self.speech(req)
         data=json.loads(self.store.claim()[3]);self.assertEqual(data['seasons'],'2')
 
+    def test_request_slot_is_collapsed_to_one_visible_line(self):
+        req = self.request()
+        req['request']['intent']['slots']['request']['value'] = 'check\nthe\r\tlogs now please\u0085ok \u202eevil\u2066'
+        self.speech(req)
+        self.assertEqual(self.store.claim()[3], 'check the logs now please ok evil')
+
+    def test_control_only_request_is_not_queued(self):
+        req = self.request()
+        req['request']['intent']['slots']['request']['value'] = '\n\u202e\t'
+        self.assertIn('between one and two thousand', self.speech(req))
+        self.assertIsNone(self.store.claim())
+
+    def test_media_title_is_collapsed_to_one_line(self):
+        # The newline becomes a space; U+200F is a format control (Cf) and is dropped.
+        req = self.request(name='MediaCheckMovieIntent')
+        req['request']['intent']['slots'] = {'title': {'value': 'Edge\nof Tomorrow\u200f'}}
+        self.speech(req)
+        self.assertEqual(json.loads(self.store.claim()[3])['query'], 'Edge of Tomorrow')
+
     def test_launch_keeps_skill_open_for_a_followup(self):
         req=self.request();req['request']={'type':'LaunchRequest','requestId':'launch'}
         result=self.router.route(req)['response']
